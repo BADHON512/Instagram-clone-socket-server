@@ -24,7 +24,7 @@ const io = new Server(server, {
 });
 
 const users = {}; // for user store
-console.log(users, "usersvai");
+
 
 io.on("connection", (socket) => {
   console.log("user connected", socket.id);
