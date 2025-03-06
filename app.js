@@ -1,30 +1,66 @@
-import express from "express"
+import express from "express";
 import { Server } from "socket.io";
 import { createServer } from "http";
+import cors from "cors";
 
-createServer
+const port = 5000;
+const app = express();
+app.use(
+  cors({
+    origin: "*",
+    methods: ["GET", "POST"],
+    credentials: true,
+  })
+);
 
-const port=5000;
-const app=express();
+const server = createServer(app);
 
-const server= createServer(app)
+const io = new Server(server, {
+  cors: {
+    origin: "*",
+    methods: ["GET", "POST"],
+    credentials: true,
+  },
+});
 
-const io =new Server(server)
+const users = {}; // for user store
+console.log(users, "usersvai");
 
+io.on("connection", (socket) => {
+  console.log("user connected", socket.id);
 
-io.on("connection",(socket)=>{
-console.log("user connected",socket.id)
-socket.on("message",(data)=>{
-io.emit("message:received",data)
-})
-socket.on("disconnect",()=>{
-console.log("user disconnected",socket.id)
-})
-})
+  socket.on("register", (userId) => {
+    users[userId] = socket.id;
+    console.log(`User ${userId} connected with socket ${socket.id}`);
+  });
+  socket.on("private_message", ({ senderId, receiverId, message }) => {
+    const receiverSocketId = users[receiverId];
 
-app.get("/",(req,res)=>{
-res.send("hello world")
-})
-app.listen(port,()=>{
-console.log(`server is running on port ${port}`)
-})
+    if (receiverSocketId) {
+      io.to(receiverSocketId).emit("private_message", {
+        senderId,
+        receiverId,
+        message,
+      }); // ✅ receiverId পাঠাচ্ছি
+      console.log(`Message sent from ${senderId} to ${receiverId}: ${message}`);
+    } else {
+      console.log(`User ${receiverId} is not online`);
+    }
+  });
+
+  socket.on("disconnect", () => {
+    Object.keys(users).forEach((userId) => {
+      if (users[userId] === socket.id) {
+        delete users[userId];
+      }
+    });
+    console.log("user disconnected", socket.id);
+  });
+});
+
+app.get("/", (req, res) => {
+  res.send("hello world");
+});
+server.listen(port, () => {
+  console.log(`server is running on port ${port}`);
+});
