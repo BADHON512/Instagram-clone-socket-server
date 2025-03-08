@@ -17,10 +17,11 @@ const server = createServer(app);
 
 const io = new Server(server, {
   cors: {
-    origin: "*",
+    origin: ["http://localhost:3000/", "https://instagram-three-green.vercel.app/"], // দুইটা URL
     methods: ["GET", "POST"],
     credentials: true,
   },
+  transports: ["websocket", "polling"],
 });
 
 const users = {}; // for user store
