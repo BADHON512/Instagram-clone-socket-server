@@ -17,7 +17,10 @@ const server = createServer(app);
 
 const io = new Server(server, {
   cors: {
-    origin: ["http://localhost:3000/", "https://instagram-three-green.vercel.app/"], // দুইটা URL
+    origin: [
+      "http://localhost:3000/",
+      "https://instagram-three-green.vercel.app/",
+    ], // দুইটা URL
     methods: ["GET", "POST"],
     credentials: true,
   },
@@ -25,7 +28,6 @@ const io = new Server(server, {
 });
 
 const users = {}; // for user store
-
 
 io.on("connection", (socket) => {
   console.log("user connected", socket.id);
