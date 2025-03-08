@@ -17,16 +17,15 @@ const server = createServer(app);
 
 const io = new Server(server, {
   cors: {
-    origin: ["http://localhost:3000", "https://your-frontend-url.com"],
+    origin: [
+      "http://localhost:3000/",
+      "https://instagram-three-green.vercel.app/",
+    ], // দুইটা URL
     methods: ["GET", "POST"],
     credentials: true,
   },
   transports: ["websocket", "polling"],
-  allowEIO3: true,
-  pingInterval: 25000, 
-  pingTimeout: 60000, 
 });
-
 
 const users = {}; // for user store
 
